@@ -21,23 +21,18 @@ public class SJsonHelper {
 
     Object json;
 
-    public SJsonExpand getValueByKeyPath(Map<String, Object> jsonObject, String keyPath){
-        try {
-            if(jsonObject==null){
-                throw new SJsonNullException("当前jsonObject为null,key: "+keyPath);
-            }
-            String[] keyArray = keyPath.split("\\.");
-            List<String> keyList = new ArrayList<String>();
-            for(int i=0; i<keyArray.length;i++){
-                keyList.add(keyArray[i]);
-            }
+    public SJsonExpand getValueByKeyPath(Map<String, Object> jsonObject, String keyPath) throws SJsonNullException, SJsonFormatException, SJsonTypeException, SJsonArrayBlankException {
+        if(jsonObject==null){
+            throw new SJsonNullException("当前jsonObject为null,要获取的key: "+keyPath);
+        }
+        String[] keyArray = keyPath.split("\\.");
+        List<String> keyList = new ArrayList<String>();
+        for(int i=0; i<keyArray.length;i++){
+            keyList.add(keyArray[i]);
+        }
 
-            return getValueByKeyPath(new JSONObject(jsonObject), keyList,0);
-        }
-        catch (Exception e){
-            System.out.println(e.toString());
-        }
-        return null;
+        return getValueByKeyPath(new JSONObject(jsonObject), keyList,0);
+
     }
 
     /**
@@ -82,7 +77,7 @@ public class SJsonHelper {
                 return new SJsonExpand(key, objectList);
             }
             else {
-                throw new SJsonArrayBlankException("当前jsonArray为空,key: "+key);
+                throw new SJsonArrayBlankException("当前jsonArray为空,要获取的key: "+key);
             }
         }
 
@@ -101,9 +96,12 @@ public class SJsonHelper {
         return null;
     }
 
-    public SJsonExpand getValueFromSimpleJsonObjectByKey(Object jsonObject, String key) throws SJsonFormatException {
+    public SJsonExpand getValueFromSimpleJsonObjectByKey(Object jsonObject, String key) throws SJsonFormatException, SJsonNullException {
         SJsonExpand sJsonExpand = null;
         Object value =null;
+        if(jsonObject==null){
+            throw new SJsonNullException("当前jsonObject为null,要获取的key: "+key);
+        }
         if(((Map)jsonObject).containsKey(key)){
             value = ((Map)jsonObject).get(key);
         }
@@ -158,17 +156,33 @@ public class SJsonHelper {
         jsonType= SJsonHelper.getObjectType(((Map<String, Object>)json).get("o-key3"));
         jsonType= SJsonHelper.getObjectType(((Map<String, Object>)json).get("o-key4"));
 
-        SJsonExpand sJsonExpand = getValueByKeyPath(omap, "o-key1");
-        sJsonExpand = getValueByKeyPath(omap, "o-key3");
-        sJsonExpand = getValueByKeyPath(omap, "o-key4");
-        sJsonExpand = getValueByKeyPath(omap, "o-key5");
-        sJsonExpand = getValueByKeyPath(omap, "o-key9");
-        sJsonExpand = getValueByKeyPath(omap, "i-key.i-key1");
-        sJsonExpand = getValueByKeyPath(omap, "i-key.i-list");
-        sJsonExpand = getValueByKeyPath(omap, "o-list");
-        sJsonExpand = getValueByKeyPath(omap, "o-llist.i-key1");
-        sJsonExpand = getValueByKeyPath(omap, "o-llit.i-list");
-        sJsonExpand = getValueByKeyPath(null, "o-llit.i-list");
+        try {
+            SJsonExpand sJsonExpand = getValueByKeyPath(omap, "o-key1");
+            sJsonExpand.printSJsonExpand();
+            sJsonExpand = getValueByKeyPath(omap, "o-key3");
+            sJsonExpand.printSJsonExpand();
+            sJsonExpand = getValueByKeyPath(omap, "o-key4");
+            sJsonExpand.printSJsonExpand();
+            sJsonExpand = getValueByKeyPath(omap, "o-key5");
+            sJsonExpand.printSJsonExpand();
+//            sJsonExpand = getValueByKeyPath(omap, "o-key9");
+//            sJsonExpand.toString();
+            sJsonExpand = getValueByKeyPath(omap, "i-key.i-key1");
+            sJsonExpand.printSJsonExpand();
+            sJsonExpand = getValueByKeyPath(omap, "i-key.i-list");
+            sJsonExpand.printSJsonExpand();
+            sJsonExpand = getValueByKeyPath(omap, "o-list");
+            sJsonExpand.printSJsonExpand();
+            sJsonExpand = getValueByKeyPath(omap, "o-llist.i-key1");
+            sJsonExpand.printSJsonExpand();
+//            sJsonExpand = getValueByKeyPath(omap, "o-llit.i-list");
+//            sJsonExpand.printSJsonExpand();
+//            sJsonExpand = getValueByKeyPath(null, "o-llit.i-list");
+//            sJsonExpand.printSJsonExpand();
+        }
+        catch (Exception e){
+            System.out.println(e.toString());
+        }
         System.out.print("123");
     }
 

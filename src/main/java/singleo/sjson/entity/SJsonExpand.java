@@ -106,7 +106,18 @@ public class SJsonExpand {
         return valueType;
     }
 
+    @Override
+    public String toString() {
+        return "SJsonExpand{" +
+                "key='" + key + '\'' +
+                ", value=" + value +
+                ", valueType=" + valueType +
+                '}';
+    }
 
+    public void printSJsonExpand(){
+        System.out.println(toString());
+    }
 
     public static void main(String[] args){
         String s="{\n" +
