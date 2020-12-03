@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.sun.xml.internal.ws.api.message.ExceptionHasMessage;
 import singleo.sjson.entity.JsonType;
 import singleo.sjson.entity.SJsonExpand;
 import singleo.sjson.exception.SJsonArrayBlankException;
 import singleo.sjson.exception.SJsonFormatException;
+import singleo.sjson.exception.SJsonNullException;
 import singleo.sjson.exception.SJsonTypeException;
 
 import java.util.ArrayList;
@@ -20,16 +22,20 @@ public class SJsonHelper {
     Object json;
 
     public SJsonExpand getValueByKeyPath(Map<String, Object> jsonObject, String keyPath){
-        String[] keyArray = keyPath.split("\\.");
-        List<String> keyList = new ArrayList<String>();
-        for(int i=0; i<keyArray.length;i++){
-            keyList.add(keyArray[i]);
-        }
         try {
+            if(jsonObject==null){
+                throw new SJsonNullException("当前jsonObject为null,key: "+keyPath);
+            }
+            String[] keyArray = keyPath.split("\\.");
+            List<String> keyList = new ArrayList<String>();
+            for(int i=0; i<keyArray.length;i++){
+                keyList.add(keyArray[i]);
+            }
+
             return getValueByKeyPath(new JSONObject(jsonObject), keyList,0);
         }
         catch (Exception e){
-            System.out.println(e.toString()+" "+e.getMessage());
+            System.out.println(e.toString());
         }
         return null;
     }
@@ -44,7 +50,9 @@ public class SJsonHelper {
      * @throws SJsonTypeException
      * @throws SJsonFormatException
      */
-    public SJsonExpand getValueByKeyPath(Object jsonObject, List<String> keyPath, int currentDepth) throws SJsonTypeException, SJsonFormatException, SJsonArrayBlankException {
+    private SJsonExpand getValueByKeyPath(Object jsonObject, List<String> keyPath, int currentDepth) throws SJsonTypeException, SJsonFormatException, SJsonArrayBlankException, SJsonNullException {
+
+
         JsonType jsonType = getObjectType(jsonObject);
         String key = keyPath.get(currentDepth);
 
@@ -74,12 +82,14 @@ public class SJsonHelper {
                 return new SJsonExpand(key, objectList);
             }
             else {
-                throw new SJsonArrayBlankException("当前jsonArray为空");
+                throw new SJsonArrayBlankException("当前jsonArray为空,key: "+key);
             }
         }
 
         if(jsonType==JsonType.JSONObject){
             Object value=null;
+
+
             if(((Map)jsonObject).containsKey(key)){
                 value = ((Map)jsonObject).get(key);
             }
@@ -102,6 +112,10 @@ public class SJsonHelper {
         }
         sJsonExpand = new SJsonExpand(key,value);
         return sJsonExpand;
+    }
+
+    public static String getJsonStringWithNull(Map<String, Object> map){
+        return JSON.toJSONString(map, SerializerFeature.WriteMapNullValue);
     }
 
     public void test(){
@@ -154,7 +168,7 @@ public class SJsonHelper {
         sJsonExpand = getValueByKeyPath(omap, "o-list");
         sJsonExpand = getValueByKeyPath(omap, "o-llist.i-key1");
         sJsonExpand = getValueByKeyPath(omap, "o-llit.i-list");
-
+        sJsonExpand = getValueByKeyPath(null, "o-llit.i-list");
         System.out.print("123");
     }
 

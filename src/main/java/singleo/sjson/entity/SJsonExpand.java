@@ -22,6 +22,12 @@ public class SJsonExpand {
         if(sJsonExpand.getKey()!=anotherSJsonExpand.getKey()){
             return false;
         }
+        if(sJsonExpand.getValue()==null && anotherSJsonExpand.getValue()==null){
+            return true;
+        }
+        if((sJsonExpand.getValue()!=null && anotherSJsonExpand.getValue()==null)||(sJsonExpand.getValue()==null && anotherSJsonExpand.getValue()!=null)){
+            return false;
+        }
         if(sJsonExpand.getValueType() != anotherSJsonExpand.getValueType()){
             return false;
         }
@@ -107,7 +113,7 @@ public class SJsonExpand {
                 "  \"paramz\": {\n" +
                 "    \"feeds\": [\n" +
                 "      {\n" +
-                "        \"id\": 299076,\n" +
+                "        \"id\": null,\n" +
                 "        \"data\": {\n" +
                 "          \"changed\": \"2015-09-22 16:01:41\"\n" +
                 "        }\n" +
@@ -130,6 +136,7 @@ public class SJsonExpand {
                 "  }\n" +
                 "}";
         SJsonExpand json1 = new SJsonExpand("j", JSON.parse(s));
+        SJsonExpand json11 = new SJsonExpand("j", JSON.parseObject(s));
         SJsonExpand json2 = new SJsonExpand("j", JSON.parse(ss));
         boolean isE= SJsonExpand.simpleCompareWith(json1,json2);
 
