@@ -20,7 +20,7 @@ public class SJsonHelper {
 
 
     public static Boolean compareTwoSJsonExpandIsEqual(SJsonExpand sJsonExpand, SJsonExpand anotherSJsonExpand){
-        if(sJsonExpand.getKey()!=anotherSJsonExpand.getKey()){
+        if(!sJsonExpand.getKey().equals(anotherSJsonExpand.getKey())){
             return false;
         }
         if(sJsonExpand.getValue()==null && anotherSJsonExpand.getValue()==null){
