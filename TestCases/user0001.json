@@ -1,0 +1,22 @@
+{
+  "interfaceName":"user0001",
+  "request":{
+  "app":"",
+  "body":{
+    "id":123,
+	"name":"qwe"
+    }
+  },
+
+  "response":{
+	    "status":"",
+		"code":"",
+		"body":{
+			"id":123,
+			"name":"qwe",
+			"desc":null
+		},
+	    "desc":""
+  }
+}
+
