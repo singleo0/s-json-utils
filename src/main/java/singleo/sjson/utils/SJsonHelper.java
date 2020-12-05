@@ -133,7 +133,7 @@ public class SJsonHelper {
 
     /**
      * [[{"key":"qwe"}],["123"],456,{"key":"asd"}]
-     * 暂规定jsonarray中的类型一致,都为对象，都为数组，都为字符串
+     * 暂规定jsonarray中的类型一致,1.都为对象，2.都为数组，3.都为字符串
      * @param jsonObject
      * @param keyPath
      * @param currentDepth
@@ -142,7 +142,6 @@ public class SJsonHelper {
      * @throws SJsonFormatException
      */
     private static SJsonExpand getValueByKeyPath(Object jsonObject, List<String> keyPath, int currentDepth) throws SJsonTypeException, SJsonFormatException, SJsonArrayBlankException, SJsonNullException {
-
 
         JsonType jsonType = getObjectType(jsonObject);
         String key = keyPath.get(currentDepth);
@@ -155,7 +154,7 @@ public class SJsonHelper {
 
         if(jsonType != JsonType.JSONObject && jsonType != JsonType.JSONArray){
 
-            throw new SJsonTypeException("期望jsonObject为JSONObject或JSONArray,但为: "+jsonType.toString()+" 当前为keyPath: "+kkeyPath+" 当前key: "+key);
+            throw new SJsonTypeException(jsonType,kkeyPath,key,jsonObject);
         }
 
         if(currentDepth == keyPath.size()-1 ){
@@ -163,7 +162,7 @@ public class SJsonHelper {
                 return getValueFromSimpleJsonObjectByKey(jsonObject, key, kkeyPath);
             }
             else if(jsonType!=JsonType.JSONArray){
-                throw new SJsonTypeException("当前为keyPath: "+kkeyPath+" 的最后一个key: "+key+ ",期望jsonObject为JSONObject或JSONArray,但为: "+jsonType.toString());
+                throw new SJsonTypeException(jsonType,kkeyPath,key,jsonObject);
             }
         }
 
@@ -180,7 +179,7 @@ public class SJsonHelper {
                 return new SJsonExpand(key, objectList);
             }
             else {
-                throw new SJsonArrayBlankException("当前jsonArray为空,要获取的keyPath: "+kkeyPath+" 当前key: "+ key);
+                throw new SJsonArrayBlankException(kkeyPath,key,jsonObject);
             }
         }
 
@@ -191,7 +190,7 @@ public class SJsonHelper {
                 value = ((Map)jsonObject).get(key);
             }
             else {
-                throw new SJsonFormatException("当前jsonObject不包含名为 "+key +" 的key,keyPah: "+kkeyPath);
+                throw new SJsonFormatException(kkeyPath,key,jsonObject);
             }
             return getValueByKeyPath(value,keyPath,currentDepth+1);
         }
@@ -202,13 +201,13 @@ public class SJsonHelper {
         SJsonExpand sJsonExpand = null;
         Object value =null;
         if(jsonObject==null){
-            throw new SJsonNullException("当前jsonObject为null,要获取的key: "+key+", keyPath为: "+keyPath);
+            throw new SJsonNullException(keyPath,key);
         }
         if(((Map)jsonObject).containsKey(key)){
             value = ((Map)jsonObject).get(key);
         }
         else {
-            throw new SJsonFormatException("当前jsonObject不包含名为 "+key +" 的key"+", keyPath为: "+keyPath);
+            throw new SJsonFormatException(keyPath,key,jsonObject);
         }
         sJsonExpand = new SJsonExpand(key,value);
         return sJsonExpand;
@@ -290,8 +289,8 @@ public class SJsonHelper {
             sJsonExpand.printSJsonExpand();
             sJsonExpand = getValueByKeyPath(omap, "o-llist.i-key1");
             sJsonExpand.printSJsonExpand();
-//            sJsonExpand = getValueByKeyPath(omap, "o-llit.i-list");
-//            sJsonExpand.printSJsonExpand();
+            sJsonExpand = getValueByKeyPath(omap, "o-llit.i-list");
+            sJsonExpand.printSJsonExpand();
             sJsonExpand = getValueByKeyPath(null, "o-llit.i-list");
             sJsonExpand.printSJsonExpand();
         }
