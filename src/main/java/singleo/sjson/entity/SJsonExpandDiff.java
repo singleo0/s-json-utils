@@ -65,7 +65,7 @@ public class SJsonExpandDiff {
             }
         } catch (SJsonException e) {
             isEqual=false;
-            diff+=keyPath+".*** "+e.toString()+"\r\n";
+            diff+="当前keyPath: "+keyPath+".*** "+e.toString()+"\r\n";
         }
         return this;
     }
