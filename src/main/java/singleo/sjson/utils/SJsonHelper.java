@@ -97,8 +97,8 @@ public class SJsonHelper {
         if(sJsonExpand.getValueType()!=JsonType.JSONArray){
             throw new SJsonTypeException("期望的json类型为array,但为: "+sJsonExpand.getValueType());
         }
-        ArrayList jsonArray1 = (ArrayList) sJsonExpand.getValue();
-        ArrayList jsonArray2 = (ArrayList) anotherSJsonExpand.getValue();
+        List jsonArray1 = (List) sJsonExpand.getValue();
+        List jsonArray2 = (List) anotherSJsonExpand.getValue();
 
         if(jsonArray1.size()!=jsonArray2.size()){
             return false;
@@ -260,7 +260,10 @@ public class SJsonHelper {
 //        String jsonStr = JSON.toJSONString(omap, SerializerFeature.WriteMapNullValue);
 
         json = JSON.toJSON(omap);
-
+        List<String> list1 = new ArrayList<String>();
+        list1.add("list2");
+        list1.add("list3");
+        imap.put("o-list", list1);
         json2=JSON.toJSON(imap);
         SJsonHelper.getObjectType(json);
         JsonType jsonType=null;
@@ -307,6 +310,7 @@ public class SJsonHelper {
         }
         List<String> path=new ArrayList<String>();
         path.add("o-key1");
+        path.add("o-list.***");
         SJsonExpandDiff diff =  generateDiff(json,json2,path);
 
         System.out.print("123");
