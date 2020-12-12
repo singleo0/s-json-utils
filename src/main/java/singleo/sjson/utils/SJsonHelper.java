@@ -77,7 +77,7 @@ public class SJsonHelper {
 
             for(int i=0; i<mapKeyList1.size();i++){
                 SJsonExpand json1 =new SJsonExpand(mapKeyList1.get(i), map1.get(mapKeyList1.get(i)));
-                SJsonExpand json2 =new SJsonExpand(mapKeyList2.get(i), map2.get(mapKeyList2.get(i)));
+                SJsonExpand json2 =new SJsonExpand(mapKeyList1.get(i), map2.get(mapKeyList1.get(i)));
                 if(!compareTwoSJsonExpandIsEqual(json1,json2)){
                     return false;
                 }
