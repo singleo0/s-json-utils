@@ -220,7 +220,7 @@ public class SJsonHelper {
     public static Object getJsonObjectFromJsonFile(String jsonFilePath) throws IOException, SJsonTypeException {
         String jsonString = FileUtils.getStringFromFile(jsonFilePath);
         Object object = JSON.parse(jsonString);
-        if(getObjectType(object)!=JsonType.JSONObject){
+        if(getObjectType(object)!=JsonType.JSONObject && getObjectType(object)!=JsonType.JSONArray){
             throw new SJsonTypeException("该json文件中不是jsonObject");
         }
         return object;
