@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import singleo.sjson.entity.JsonType;
+import singleo.sjson.entity.SJsonType;
 import singleo.sjson.entity.SJsonExpand;
 import singleo.sjson.entity.SJsonExpandDiff;
 import singleo.sjson.exception.*;
@@ -17,7 +17,41 @@ import java.util.Map;
 
 public class SJsonHelper {
 
+    public static List<String> getKeyPathList(Object jsonObject){
+        List<String> keyPathList = new ArrayList<String>();
+        getKeyPathList(jsonObject, keyPathList, "");
+        for(int i=0; i<keyPathList.size(); i++){
+            keyPathList.set(i,keyPathList.get(i).substring(1));
+        }
+        return keyPathList;
+    }
 
+    public static void getKeyPathList(Object jsonObject,List<String> keyPathList, String parentKeyPath){
+        SJsonType sJsonType = getObjectType(jsonObject);
+        if(sJsonType!=SJsonType.JSONObject && sJsonType!=SJsonType.JSONArray){
+            return;
+        }
+        if(sJsonType==SJsonType.JSONArray){
+            List currentList = (List)jsonObject;
+            if(currentList.size()==0){
+                return;
+            }
+            getKeyPathList(currentList.get(0), keyPathList, parentKeyPath);
+        }
+        if(sJsonType==SJsonType.JSONObject){
+            Map currentObject = (Map) jsonObject;
+            if(currentObject==null){
+                return;
+            }
+            List<String> tempKeyList = new ArrayList<String>();
+            tempKeyList.addAll(currentObject.keySet());
+            for(int i=0; i<tempKeyList.size(); i++){
+                String currentKeyPath = parentKeyPath+"."+tempKeyList.get(i);
+                keyPathList.add(currentKeyPath);
+                getKeyPathList(currentObject.get(tempKeyList.get(i)), keyPathList,currentKeyPath );
+            }
+        }
+    }
 
     public static Boolean compareTwoSJsonExpandIsEqual(SJsonExpand sJsonExpand, SJsonExpand anotherSJsonExpand){
         if(!sJsonExpand.getKey().equals(anotherSJsonExpand.getKey())){
@@ -32,16 +66,16 @@ public class SJsonHelper {
         if(sJsonExpand.getValueType() != anotherSJsonExpand.getValueType()){
             return false;
         }
-        if(sJsonExpand.getValueType()==JsonType.String){
+        if(sJsonExpand.getValueType()== SJsonType.String){
             return ((String)sJsonExpand.getValue()).equals((String) anotherSJsonExpand.getValue());
         }
-        if(sJsonExpand.getValueType()==JsonType.Integer){
+        if(sJsonExpand.getValueType()== SJsonType.Integer){
             return ((Integer)sJsonExpand.getValue()).equals((Integer) anotherSJsonExpand.getValue());
         }
-        if(sJsonExpand.getValueType()==JsonType.Boolean){
+        if(sJsonExpand.getValueType()== SJsonType.Boolean){
             return ((Boolean)sJsonExpand.getValue()).equals((Boolean) anotherSJsonExpand.getValue());
         }
-        if(sJsonExpand.getValueType() == JsonType.JSONArray){
+        if(sJsonExpand.getValueType() == SJsonType.JSONArray){
             if(((List)sJsonExpand.getValue()).size() != ((List)anotherSJsonExpand.getValue()).size()){
                 return false;
             }
@@ -54,7 +88,7 @@ public class SJsonHelper {
             }
             return true;
         }
-        else if(sJsonExpand.getValueType() == JsonType.JSONObject){
+        else if(sJsonExpand.getValueType() == SJsonType.JSONObject){
             Map<String,Object> map1 = (Map<String,Object>) sJsonExpand.getValue();
             Map<String,Object> map2 = (Map<String,Object>) anotherSJsonExpand.getValue();
 
@@ -94,7 +128,7 @@ public class SJsonHelper {
         if(sJsonExpand.getValueType() != anotherSJsonExpand.getValueType()){
             return false;
         }
-        if(sJsonExpand.getValueType()!=JsonType.JSONArray){
+        if(sJsonExpand.getValueType()!= SJsonType.JSONArray){
             throw new SJsonTypeException("期望的json类型为array,但为: "+sJsonExpand.getValueType());
         }
         List jsonArray1 = (List) sJsonExpand.getValue();
@@ -143,7 +177,7 @@ public class SJsonHelper {
      */
     private static SJsonExpand getValueByKeyPath(Object jsonObject, List<String> keyPath, int currentDepth) throws SJsonTypeException, SJsonFormatException, SJsonArrayBlankException, SJsonNullException {
 
-        JsonType jsonType = getObjectType(jsonObject);
+        SJsonType sJsonType = getObjectType(jsonObject);
         String key = keyPath.get(currentDepth);
 
         String kkeyPath = "";
@@ -152,21 +186,21 @@ public class SJsonHelper {
         }
         kkeyPath+=keyPath.get(keyPath.size()-1);
 
-        if(jsonType != JsonType.JSONObject && jsonType != JsonType.JSONArray){
+        if(sJsonType != SJsonType.JSONObject && sJsonType != SJsonType.JSONArray){
 
-            throw new SJsonTypeException(jsonType,kkeyPath,key,jsonObject);
+            throw new SJsonTypeException(sJsonType,kkeyPath,key,jsonObject);
         }
 
         if(currentDepth == keyPath.size()-1 ){
-            if(jsonType==JsonType.JSONObject){
+            if(sJsonType == SJsonType.JSONObject){
                 return getValueFromSimpleJsonObjectByKey(jsonObject, key, kkeyPath);
             }
-            else if(jsonType!=JsonType.JSONArray){
-                throw new SJsonTypeException(jsonType,kkeyPath,key,jsonObject);
+            else if(sJsonType != SJsonType.JSONArray){
+                throw new SJsonTypeException(sJsonType,kkeyPath,key,jsonObject);
             }
         }
 
-        if(jsonType == JsonType.JSONArray){
+        if(sJsonType == SJsonType.JSONArray){
             List jsonArray = (List) jsonObject;
             List<Object> objectList = new ArrayList<Object>();
             Object subObject=null;
@@ -183,7 +217,7 @@ public class SJsonHelper {
             }
         }
 
-        if(jsonType==JsonType.JSONObject){
+        if(sJsonType == SJsonType.JSONObject){
             Object value=null;
 
             if(((Map)jsonObject).containsKey(key)){
@@ -220,7 +254,7 @@ public class SJsonHelper {
     public static Object getJsonObjectFromJsonFile(String jsonFilePath) throws IOException, SJsonTypeException {
         String jsonString = FileUtils.getStringFromFile(jsonFilePath);
         Object object = JSON.parse(jsonString);
-        if(getObjectType(object)!=JsonType.JSONObject && getObjectType(object)!=JsonType.JSONArray){
+        if(getObjectType(object)!= SJsonType.JSONObject && getObjectType(object)!= SJsonType.JSONArray){
             throw new SJsonTypeException("该json文件中不是jsonObject");
         }
         return object;
@@ -266,12 +300,12 @@ public class SJsonHelper {
         imap.put("o-list", list1);
         json2=JSON.toJSON(imap);
         SJsonHelper.getObjectType(json);
-        JsonType jsonType=null;
-        jsonType= SJsonHelper.getObjectType(((Map<String, Object>)json).get("i-key"));
-        jsonType= SJsonHelper.getObjectType(((Map<String, Object>)json).get("o-list"));
-        jsonType= SJsonHelper.getObjectType(((Map<String, Object>)json).get("o-key1"));
-        jsonType= SJsonHelper.getObjectType(((Map<String, Object>)json).get("o-key3"));
-        jsonType= SJsonHelper.getObjectType(((Map<String, Object>)json).get("o-key4"));
+        SJsonType sJsonType =null;
+        sJsonType = SJsonHelper.getObjectType(((Map<String, Object>)json).get("i-key"));
+        sJsonType = SJsonHelper.getObjectType(((Map<String, Object>)json).get("o-list"));
+        sJsonType = SJsonHelper.getObjectType(((Map<String, Object>)json).get("o-key1"));
+        sJsonType = SJsonHelper.getObjectType(((Map<String, Object>)json).get("o-key3"));
+        sJsonType = SJsonHelper.getObjectType(((Map<String, Object>)json).get("o-key4"));
 
         try {
             SJsonExpand sJsonExpand = getValueByKeyPath(omap, "o-key1");
@@ -313,6 +347,8 @@ public class SJsonHelper {
         path.add("o-list.***");
         SJsonExpandDiff diff =  generateDiff(json,json2,path);
 
+
+        List<String> keyPathList = getKeyPathList(json);
         System.out.print("123");
     }
 
@@ -347,26 +383,26 @@ public class SJsonHelper {
 
 
 
-    public static JsonType getObjectType(Object object){
-        JsonType jsonType = JsonType.JSONObject;
+    public static SJsonType getObjectType(Object object){
+        SJsonType sJsonType = SJsonType.JSONObject;
 
         try {
             Map jsonObject = (Map) object;
-            return jsonType;
+            return sJsonType;
         } catch (Exception e){
 
         }
 
         try {
             JSONObject jsonObject = (JSONObject) object;
-            return jsonType;
+            return sJsonType;
         } catch (Exception e){
-            jsonType = JsonType.JSONArray;
+            sJsonType = SJsonType.JSONArray;
         }
 
         try {
             List jsonArray = (List)object;
-            return jsonType;
+            return sJsonType;
         }
         catch (Exception e){
 
@@ -374,33 +410,33 @@ public class SJsonHelper {
 
         try {
             JSONArray jsonArray = (JSONArray)object;
-            return jsonType;
+            return sJsonType;
         }
         catch (Exception e){
-            jsonType = JsonType.Integer;
+            sJsonType = SJsonType.Integer;
         }
 
         try {
             Integer integer = (Integer) object;
-            return jsonType;
+            return sJsonType;
         }
         catch (Exception e){
-            jsonType = JsonType.Boolean;
+            sJsonType = SJsonType.Boolean;
         }
         try {
             Boolean b = (Boolean) object;
-            return jsonType;
+            return sJsonType;
         }
         catch (Exception e){
-            jsonType = JsonType.String;
+            sJsonType = SJsonType.String;
         }
         try {
             String str = (String) object;
-            return jsonType;
+            return sJsonType;
         }
         catch (Exception e){
-            jsonType = JsonType.Undefine;
+            sJsonType = SJsonType.Undefine;
         }
-        return jsonType;
+        return sJsonType;
     }
 }

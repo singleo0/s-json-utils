@@ -7,14 +7,12 @@ import singleo.sjson.exception.SJsonNullException;
 import singleo.sjson.exception.SJsonTypeException;
 import singleo.sjson.utils.SJsonHelper;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class SJsonExpand {
     private String key;
     private Object value;
-    private JsonType valueType;
+    private SJsonType valueType;
 
     public SJsonExpand(String key, Object value){
         this.key = key;
@@ -31,7 +29,7 @@ public class SJsonExpand {
         return value;
     }
 
-    public JsonType getValueType() {
+    public SJsonType getValueType() {
         return valueType;
     }
 
