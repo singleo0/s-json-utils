@@ -115,10 +115,5 @@ public class FileUtils
         return new String(strBuffer);
     }
 
-    public static void main(String[] args) throws IOException {
-        System.out.println(FileUtils.getStringFromFile("D:\\singleo\\Software\\ideaIU\\git-repo\\s-json-utils\\TestCases\\user0001.json"));
-
-
-    }
 }
 

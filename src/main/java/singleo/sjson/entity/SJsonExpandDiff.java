@@ -3,6 +3,7 @@ package singleo.sjson.entity;
 import singleo.sjson.exception.*;
 import singleo.sjson.utils.SJsonHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SJsonExpandDiff {
@@ -33,7 +34,7 @@ public class SJsonExpandDiff {
         return this;
     }
 
-    public SJsonExpandDiff generateDiffByKey(String keyPath){
+    private SJsonExpandDiff generateDiffByKey(String keyPath){
         SJsonExpand sJsonValue1 = null;
         SJsonExpand sJsonValue2=null;
         try {
@@ -50,7 +51,7 @@ public class SJsonExpandDiff {
         return this;
     }
 
-    public SJsonExpandDiff generateDiffByKey_NoSortArray(String keyPath){
+    private SJsonExpandDiff generateDiffByKey_NoSortArray(String keyPath){
         if(keyPath.endsWith(".***")){
             keyPath = keyPath.replace(".***", "");
         }
@@ -59,7 +60,7 @@ public class SJsonExpandDiff {
         try {
             sJsonValue1 = SJsonHelper.getValueByKeyPath(json1, keyPath);
             sJsonValue2 = SJsonHelper.getValueByKeyPath(json2, keyPath);
-            if(!SJsonHelper.simpleNoSortArrayCompareWith(sJsonValue1, sJsonValue2)){
+            if(!simpleNoSortArrayCompareWith(sJsonValue1, sJsonValue2)){
                 isEqual=false;
                 diff+=keyPath+".***的值不相等,value1: "+sJsonValue1.toString()+";value2:"+sJsonValue2+"\r\n";
             }
@@ -69,4 +70,29 @@ public class SJsonExpandDiff {
         }
         return this;
     }
+
+    //不按顺序,两个列表比较
+    private static boolean simpleNoSortArrayCompareWith(SJsonExpand sJsonExpand, SJsonExpand anotherSJsonExpand) throws SJsonTypeException {
+        if(sJsonExpand.getValueType() != anotherSJsonExpand.getValueType()){
+            return false;
+        }
+        if(sJsonExpand.getValueType()!= SJsonType.JSONArray){
+            throw new SJsonTypeException("期望的json类型为array,但为: "+sJsonExpand.getValueType());
+        }
+        List jsonArray1 = (List) sJsonExpand.getValue();
+        List jsonArray2 = (List) anotherSJsonExpand.getValue();
+
+        if(jsonArray1.size()!=jsonArray2.size()){
+            return false;
+        }
+        ArrayList list = new ArrayList();
+        list.addAll(jsonArray1);
+        list.removeAll(jsonArray2);
+        if(list.size()!=0){
+            return false;
+        }
+
+        return true;
+    }
+
 }
