@@ -4,12 +4,16 @@ import singleo.sjson.entity.SJsonType;
 import singleo.sjson.entity.SJsonExpand;
 import singleo.sjson.entity.SJsonExpandDiff;
 import singleo.sjson.exception.*;
+import singleo.sjson.utils.parser.DefaultSJsonParser;
+import singleo.sjson.utils.parser.ISJsonParser;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class SJsonHelper {
+
+    private static ISJsonParser sJsonParser =new DefaultSJsonParser();
 
     public static List<String> getAllKeyPath(Object jsonObject){
         List<String> keyPathList = new ArrayList<String>();
@@ -219,86 +223,11 @@ public class SJsonHelper {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public static SJsonType getObjectType(Object object){
-        SJsonType sJsonType = SJsonType.JSONObject;
+        return sJsonParser.getObjectType(object);
+    }
 
-        try {
-            Map jsonObject = (Map) object;
-            return sJsonType;
-        } catch (Exception e){
-            sJsonType = SJsonType.JSONArray;
-        }
-
-//        try {
-//            JSONObject jsonObject = (JSONObject) object;
-//            return sJsonType;
-//        } catch (Exception e){
-//
-//        }
-
-        try {
-            List jsonArray = (List)object;
-            return sJsonType;
-        }
-        catch (Exception e){
-            sJsonType = SJsonType.Integer;
-        }
-
-//        try {
-//            JSONArray jsonArray = (JSONArray)object;
-//            return sJsonType;
-//        }
-//        catch (Exception e){
-//
-//        }
-
-        try {
-            Integer integer = (Integer) object;
-            return sJsonType;
-        }
-        catch (Exception e){
-            sJsonType = SJsonType.Boolean;
-        }
-        try {
-            Boolean b = (Boolean) object;
-            return sJsonType;
-        }
-        catch (Exception e){
-            sJsonType = SJsonType.String;
-        }
-        try {
-            String str = (String) object;
-            return sJsonType;
-        }
-        catch (Exception e){
-            sJsonType = SJsonType.Undefine;
-        }
-        return sJsonType;
+    public static void setIJsonParser(ISJsonParser sJsonParser) {
+        SJsonHelper.sJsonParser = sJsonParser;
     }
 }

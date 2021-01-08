@@ -13,6 +13,11 @@
 <!--            <artifactId>fastjson</artifactId>-->
 <!--            <version>1.2.38</version>-->
 <!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.google.code.gson</groupId>-->
+<!--            <artifactId>gson</artifactId>-->
+<!--            <version>2.6.2</version>-->
+<!--        </dependency>-->
 
 
     </dependencies>
