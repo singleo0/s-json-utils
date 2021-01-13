@@ -9,44 +9,21 @@ import java.util.Map;
 public class DefaultSJsonParser implements ISJsonParser {
 
     public SJsonType getObjectType(Object object){
-        SJsonType sJsonType = SJsonType.JSONObject;
-
-        try {
-            Map jsonObject = (Map) object;
-            return sJsonType;
-        } catch (Exception e){
-            sJsonType = SJsonType.JSONArray;
+        if(object instanceof String){
+            return SJsonType.String;
         }
-
-        try {
-            List jsonArray = (List)object;
-            return sJsonType;
+        if(object instanceof Integer){
+            return SJsonType.Integer;
         }
-        catch (Exception e){
-            sJsonType = SJsonType.Integer;
+        if(object instanceof Boolean){
+            return SJsonType.Boolean;
         }
-
-        try {
-            Integer integer = (Integer) object;
-            return sJsonType;
+        if(object instanceof Map){
+            return SJsonType.JSONObject;
         }
-        catch (Exception e){
-            sJsonType = SJsonType.Boolean;
+        if(object instanceof List){
+            return SJsonType.JSONArray;
         }
-        try {
-            Boolean b = (Boolean) object;
-            return sJsonType;
-        }
-        catch (Exception e){
-            sJsonType = SJsonType.String;
-        }
-        try {
-            String str = (String) object;
-            return sJsonType;
-        }
-        catch (Exception e){
-            sJsonType = SJsonType.Undefine;
-        }
-        return sJsonType;
+        return SJsonType.Undefine;
     }
 }
